@@ -1,0 +1,67 @@
+import type { SVGProps } from 'react';
+const paths = {
+  wind: 'M3 8h12a3 3 0 1 0-3-3M2 12h17a3 3 0 1 1-3 3M4 16h5a3 3 0 1 1-3 3',
+  home: 'm3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z',
+  map: 'm3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Zm6-2v16m6-14v16',
+  heart: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z',
+  leaf: 'M20 3C9 1 2 8 5 15s14 7 15-12ZM3 22l11-12',
+  users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.8M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8-7.8a4 4 0 0 1 0 7.6',
+  chart: 'M3 3v18h18M7 14l4-5 4 3 6-7',
+  search: 'M21 21l-4.5-4.5M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z',
+  'chevron-down': 'm6 9 6 6 6-6',
+  'arrow-up-right': 'M7 17 17 7M7 7h10v10',
+  'arrow-right': 'M4 12h16m-7-7 7 7-7 7',
+  'arrow-left': 'M20 12H4m7-7-7 7 7 7',
+  plus: 'M12 5v14M5 12h14',
+  minus: 'M5 12h14',
+  locate: 'M12 2v3m0 14v3M2 12h3m14 0h3M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm0-4a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+  pin: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+  layers: 'm12 3 10 5-10 5L2 8Zm-9 10 9 5 9-5M3 18l9 5 9-5',
+  filter: 'M4 7h16M4 17h16M8 4v6m8 4v6',
+  close: 'm6 6 12 12M6 18 18 6',
+  check: 'm5 12 4 4L19 6',
+  'check-circle': 'm8 12 3 3 5-6M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z',
+  info: 'M12 11v6m0-10h.01M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z',
+  alert: 'm10.3 3.9-8.2 14a2 2 0 0 0 1.7 3h16.4a2 2 0 0 0 1.7-3l-8.2-14a2 2 0 0 0-3.4 0ZM12 9v4m0 4h.01',
+  bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 12a2 2 0 0 0 4 0',
+  bookmark: 'M6 3h12v18l-6-4-6 4Z',
+  shield: 'm12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6Zm-4 10 3 3 5-6',
+  lock: 'M5 10h14v11H5Zm3 0V6a4 4 0 1 1 8 0v4m-4 4v3',
+  user: 'M20 21v-2a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v2M12 9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
+  settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-8-3 1-3-1-2 3-3 2 1 3-1 2 1 3-1 3 3-1 2 1 3-1 2 1 3-3 3-2-1-3 1-2-1-3 1-3-3 1-2Z',
+  logout: 'M9 21H4V3h5m6 4 5 5-5 5M8 12h12',
+  sun: 'M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z',
+  cloud: 'M7 18h11a4 4 0 1 0-1-7.9A6 6 0 0 0 5 12a3 3 0 0 0 2 6Z',
+  drop: 'M12 2s-8 9-8 14a8 8 0 0 0 16 0c0-5-8-14-8-14Z',
+  calendar: 'M4 5h16v16H4Zm0 5h16M8 2v6m8-6v6',
+  clock: 'M12 8v4l3 2m-3 8a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z',
+  compare: 'M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4',
+  upload: 'M12 16V3m-5 5 5-5 5 5M3 15v6h18v-6',
+  camera: 'M3 7h4l2-3h6l2 3h4v14H3Zm9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
+  trash: 'M3 6h18M8 6V3h8v3M5 6l1 15h12l1-15M10 10v7m4-7v7',
+  eye: 'M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+  'eye-off': 'm3 3 18 18M9.8 4.2A11 11 0 0 1 12 4c6 0 10 8 10 8a21 21 0 0 1-3 4M6.3 6.3A23 23 0 0 0 2 12s4 8 10 8a10 10 0 0 0 5.7-2.3M10 10a3 3 0 0 0 4 4',
+  menu: 'M3 6h18M3 12h18M3 18h18',
+  download: 'M12 3v13m-5-5 5 5 5-5M3 17v4h18v-4',
+  refresh: 'M20 11a8 8 0 0 0-14-5L3 9m0-6v6h6M4 13a8 8 0 0 0 14 5l3-3m0 6v-6h-6',
+  globe: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0 0c5-5 5-15 0-20-5 5-5 15 0 20ZM2 12h20',
+  sparkles: 'm12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM20 2v4m-2-2h4',
+  building: 'M5 21V3h14v18M2 21h20M9 7h1m4 0h1M9 11h1m4 0h1M9 15h1m4 0h1m-3 6v-3',
+  activity: 'M2 12h5l3-9 4 18 3-9h5',
+  file: 'M14 2H4v20h16V8Zm0 0v6h6M8 13h8m-8 4h6',
+  flag: 'M4 22V3c5-4 9 4 16 0v12c-7 4-11-4-16 0',
+  mail: 'M3 5h18v14H3Zm0 0 9 8 9-8',
+  moon: 'M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10Z',
+  external: 'M14 3h7v7m0-7L10 14M10 3H3v18h18v-7',
+  book: 'M12 5C8 2 4 3 2 4v16c4-2 7-1 10 1 3-2 6-3 10-1V4c-2-1-6-2-10 1Zm0 0v16',
+  dots: 'M5 12h.01M12 12h.01M19 12h.01',
+} as const;
+export type IconName = keyof typeof paths;
+export default function Icon({ name, size = 20, ...props }: {
+  name: IconName;
+  size?: number;
+} & SVGProps<SVGSVGElement>) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" {...props}>
+    <path d={paths[name]} />
+  </svg>;
+}

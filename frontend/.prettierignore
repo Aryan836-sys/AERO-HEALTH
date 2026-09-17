@@ -1,0 +1,9 @@
+node_modules
+dist
+.test-build
+test-results
+playwright-report
+public
+contracts
+package-lock.json
+src/types/api.ts

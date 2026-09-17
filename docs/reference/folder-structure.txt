@@ -1,0 +1,118 @@
+aero-health/
+├── README.md
+├── CONTRIBUTING.md
+├── .gitignore
+├── .github/
+│   └── workflows/
+│       └── ci.yml                      # lint + tests on PR
+│
+├── backend/                            # Python + FastAPI
+│   ├── README.md
+│   ├── requirements.txt                # (or pyproject.toml)
+│   ├── .env.example
+│   ├── alembic.ini
+│   ├── alembic/
+│   │   ├── env.py                      # ← YOURS (import geoalchemy2 here)
+│   │   └── versions/                   # ← YOURS (migrations)
+│   └── app/
+│       ├── __init__.py
+│       ├── main.py                     # app + middleware + routers
+│       ├── config.py                   # pydantic-settings
+│       ├── database.py                 # ← YOURS (engine, SessionLocal, get_db)
+│       ├── models/                     # SQLAlchemy models
+│       │   ├── user.py
+│       │   ├── health_profile.py
+│       │   ├── location.py             # ← YOURS
+│       │   ├── aqi_reading.py          # ← YOURS
+│       │   ├── pollution_report.py
+│       │   └── user_alert.py
+│       ├── schemas/                    # Pydantic request/response models
+│       │   ├── reading.py              # ← YOURS (NormalizedReading + responses)
+│       │   ├── user.py
+│       │   ├── profile.py
+│       │   ├── advisory.py
+│       │   └── report.py
+│       ├── routers/                    # API endpoints (M1)
+│       │   ├── auth.py
+│       │   ├── locations.py
+│       │   ├── readings.py
+│       │   ├── profile.py
+│       │   ├── advisory.py
+│       │   ├── favorites.py
+│       │   ├── alerts.py
+│       │   ├── reports.py
+│       │   └── admin.py
+│       ├── services/
+│       │   └── advisory_engine.py      # rule-based advisory (M1)
+│       ├── adapters/                   # ← YOURS
+│       │   ├── waqi.py
+│       │   ├── openaq.py
+│       │   ├── openweather.py
+│       │   ├── normalizer.py
+│       │   └── reliability.py
+│       ├── jobs/                       # ← YOURS
+│       │   └── cache_readings.py       # the scheduled caching job
+│       ├── scripts/                    # ← YOURS
+│       │   ├── seed_locations.py
+│       │   └── import_opendata_nepal.py
+│       ├── crud/                       # query helpers (you + M3)
+│       │   ├── location.py             # ← YOURS
+│       │   ├── reading.py              # ← YOURS
+│       │   ├── user.py
+│       │   └── report.py
+│       ├── core/                       # M1
+│       │   ├── security.py             # hashing, JWT
+│       │   ├── dependencies.py         # get_current_user, require_role
+│       │   └── exceptions.py
+│       └── tests/
+│           ├── conftest.py
+│           ├── fixtures/               # ← YOURS (saved API JSON samples)
+│           ├── adapters/               # ← YOURS
+│           ├── routers/
+│           └── services/
+│
+└── frontend/                           # TypeScript + React (Vite)
+    ├── README.md
+    ├── package.json
+    ├── tsconfig.json
+    ├── vite.config.ts
+    ├── tailwind.config.js
+    ├── postcss.config.js
+    ├── .env.example
+    ├── index.html
+    ├── public/
+    └── src/
+        ├── main.tsx
+        ├── App.tsx
+        ├── index.css
+        ├── assets/
+        ├── components/
+        │   ├── common/                 # design system (M6)
+        │   │   ├── AqiIndicator.tsx    # color + label + icon
+        │   │   ├── ReliabilityBadge.tsx
+        │   │   ├── Button.tsx
+        │   │   ├── Card.tsx
+        │   │   └── states/             # Loading / Empty / Error
+        │   ├── map/                    # Leaflet components (M4)
+        │   └── charts/                 # Recharts components (M4)
+        ├── pages/
+        │   ├── Home.tsx
+        │   ├── MapPage.tsx             # (M4)
+        │   ├── AreaDetail.tsx          # (M4)
+        │   ├── Dashboard.tsx           # (M5)
+        │   ├── Profile.tsx             # (M5)
+        │   ├── ReportPage.tsx          # (M5)
+        │   ├── Awareness.tsx
+        │   └── AdminDashboard.tsx      # (M5)
+        ├── services/
+        │   ├── api.ts                  # real backend calls
+        │   └── mockApi.ts              # mock layer (unblocks frontend early)
+        ├── context/
+        │   └── AuthContext.tsx
+        ├── hooks/
+        ├── i18n/
+        │   ├── en.json
+        │   └── ne.json
+        ├── types/
+        │   └── api.ts                  # generated from backend OpenAPI
+        └── utils/
