@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.database import engine
+from app.routers import locations, readings
 
 load_dotenv()
 
@@ -29,6 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(locations.router)
+app.include_router(readings.router)
 
 # Routers get added here as they're built:
 # from app.routers import locations, readings, auth, profile, advisory, favorites, alerts, reports, admin
