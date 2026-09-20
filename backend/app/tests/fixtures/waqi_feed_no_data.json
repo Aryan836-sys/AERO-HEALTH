@@ -1,0 +1,11 @@
+{
+  "status": "ok",
+  "data": {
+    "aqi": "-",
+    "idx": 9999,
+    "city": {"geo": [27.7, 85.3], "name": "Some Station, Nepal"},
+    "dominentpol": "",
+    "iaqi": {},
+    "time": {"s": "2026-09-19 14:00:00", "iso": "2026-09-19T14:00:00+05:45"}
+  }
+}

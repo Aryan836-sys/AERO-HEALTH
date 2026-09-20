@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "data": {
+    "aqi": 121,
+    "idx": 8760,
+    "attributions": [
+      {"url": "https://waqi.info/", "name": "World Air Quality Index Project"}
+    ],
+    "city": {
+      "geo": [27.682581, 85.318841],
+      "name": "Pulchowk, Kathmandu, Nepal",
+      "url": "https://aqicn.org/city/nepal/kathmandu/pulchowk"
+    },
+    "dominentpol": "pm25",
+    "iaqi": {
+      "co": {"v": 3.4},
+      "h": {"v": 55},
+      "no2": {"v": 12.1},
+      "o3": {"v": 20.3},
+      "p": {"v": 1012.5},
+      "pm10": {"v": 60.2},
+      "pm25": {"v": 121},
+      "so2": {"v": 2.1},
+      "t": {"v": 22.4},
+      "w": {"v": 3.2}
+    },
+    "time": {
+      "s": "2026-09-19 14:00:00",
+      "tz": "+05:45",
+      "v": 1758290400,
+      "iso": "2026-09-19T14:00:00+05:45"
+    }
+  }
+}

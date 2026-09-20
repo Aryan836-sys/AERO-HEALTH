@@ -16,6 +16,7 @@ from geoalchemy2.elements import WKTElement
 
 from app.database import SessionLocal
 from app.models import Location
+from app.utils.district import nearest_district
 
 load_dotenv()
 
@@ -52,10 +53,10 @@ def seed() -> None:
         updated = 0
         for station in stations:
             station_id = str(station["uid"])
-            geometry = WKTElement(
-                f"POINT({station['lon']} {station['lat']})", srid=4326
-            )
+            lat, lng = station["lat"], station["lon"]
+            geometry = WKTElement(f"POINT({lng} {lat})", srid=4326)
             name = station["station"]["name"]
+            district = nearest_district(lat, lng)
 
             existing = (
                 db.query(Location)
@@ -66,6 +67,7 @@ def seed() -> None:
             if existing:
                 existing.area_name = name
                 existing.geometry = geometry
+                existing.district = district
                 updated += 1
             else:
                 db.add(
@@ -73,6 +75,7 @@ def seed() -> None:
                         area_name=name,
                         geometry=geometry,
                         source_station_id=station_id,
+                        district=district,
                     )
                 )
                 inserted += 1

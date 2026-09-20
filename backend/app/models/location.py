@@ -27,6 +27,11 @@ class Location(Base):
     area_name: Mapped[str] = mapped_column(String, nullable=False)
     ward: Mapped[str | None] = mapped_column(String, nullable=True)
 
+    # Kathmandu | Lalitpur | Bhaktapur -- computed by app.utils.district
+    # (WAQI gives no district field; nearest-reference-point approximation,
+    # see that module for the method and its known border-case limitation).
+    district: Mapped[str | None] = mapped_column(String, nullable=True)
+
     # SRID 4326 = WGS84, the lat/lng system GPS and the source APIs use.
     geometry: Mapped[str] = mapped_column(
         Geometry(geometry_type="POINT", srid=4326), nullable=False
