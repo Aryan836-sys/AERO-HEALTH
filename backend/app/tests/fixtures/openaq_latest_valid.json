@@ -1,0 +1,26 @@
+{
+  "meta": {"name": "openaq-api", "website": "/", "page": 1, "limit": 100, "found": 3},
+  "results": [
+    {
+      "datetime": {"utc": "2026-06-17T23:15:00Z", "local": "2026-06-18T05:00:00+05:45"},
+      "value": 21.0,
+      "coordinates": {"latitude": 27.738703, "longitude": 85.336206},
+      "sensorsId": 7710,
+      "locationsId": 3459
+    },
+    {
+      "datetime": {"utc": "2026-06-17T23:15:00Z", "local": "2026-06-18T05:00:00+05:45"},
+      "value": 38.4,
+      "coordinates": {"latitude": 27.738703, "longitude": 85.336206},
+      "sensorsId": 7711,
+      "locationsId": 3459
+    },
+    {
+      "datetime": {"utc": "2026-06-17T22:00:00Z", "local": "2026-06-18T03:45:00+05:45"},
+      "value": 12.6,
+      "coordinates": {"latitude": 27.738703, "longitude": 85.336206},
+      "sensorsId": 9999,
+      "locationsId": 3459
+    }
+  ]
+}

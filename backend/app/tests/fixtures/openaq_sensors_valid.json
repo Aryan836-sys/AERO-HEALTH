@@ -1,0 +1,15 @@
+{
+  "meta": {"name": "openaq-api", "website": "/", "page": 1, "limit": 100, "found": 2},
+  "results": [
+    {
+      "id": 7710,
+      "name": "pm25 µg/m³",
+      "parameter": {"id": 2, "name": "pm25", "units": "µg/m³", "displayName": "PM2.5"}
+    },
+    {
+      "id": 7711,
+      "name": "pm10 µg/m³",
+      "parameter": {"id": 1, "name": "pm10", "units": "µg/m³", "displayName": "PM10"}
+    }
+  ]
+}
