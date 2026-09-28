@@ -17,9 +17,14 @@ import { ErrorState, LoadingState } from '../components/common/states';
 export default function Compare() {
   const { t, i18n } = useTranslation();
   const app = useApp();
-  const [a, setA] = useState('ratnapark');
-  const [b, setB] = useState('patan');
-  const compared = useAsync(`compare:${a}:${b}`, () => api.compare(a, b), a !== b);
+  const [chosenA, setA] = useState('');
+  const [chosenB, setB] = useState('');
+  // Until the user chooses, compare the first two stations that have readings.
+  const withReadings = app.areas.filter((area) => area.reading);
+  const fallback = withReadings.length >= 2 ? withReadings : app.areas;
+  const a = app.areas.some((area) => area.id === chosenA) ? chosenA : fallback[0]?.id ?? '';
+  const b = app.areas.some((area) => area.id === chosenB) ? chosenB : fallback.find((area) => area.id !== a)?.id ?? '';
+  const compared = useAsync(`compare:${a}:${b}`, () => api.compare(a, b), !!a && !!b && a !== b);
   const first = compared.data?.find((area) => area.id === a);
   const second = compared.data?.find((area) => area.id === b);
   const difference = first?.reading && second?.reading ? Math.abs(first.reading.aqi - second.reading.aqi) : null;

@@ -13,7 +13,8 @@ import { LoadingState, ErrorState } from '../components/common/states';
 export default function Advisory() {
   const { t } = useTranslation();
   const { areas, profile, loading, error, refresh } = useApp();
-  const [areaId, setAreaId] = useState('ratnapark');
+  const [chosenId, setAreaId] = useState('');
+  const areaId = areas.some((area) => area.id === chosenId) ? chosenId : (areas.find((area) => area.reading) ?? areas[0])?.id ?? '';
   const [mode, setMode] = useState<'saved' | 'adult' | 'child'>('saved');
   const example: HealthProfile | null = mode === 'saved' ? profile : { ageGroup: mode === 'child' ? 'child' : 'adult', conditions: mode === 'child' ? ['asthma'] : [], activityLevel: 'moderate', preferredLanguage: 'en' };
   return <div className="page-content">

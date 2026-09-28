@@ -43,3 +43,18 @@ def set_alert_active(db: Session, alert_id: int, active: bool) -> UserAlert | No
         db.commit()
         db.refresh(alert)
     return alert
+
+
+def get_alert_for_user(db: Session, alert_id: int, user_id: int) -> UserAlert | None:
+    """The alert only if it belongs to `user_id` -- ownership lives in the
+    query so a route can't forget to check it."""
+    return (
+        db.query(UserAlert)
+        .filter(UserAlert.id == alert_id, UserAlert.user_id == user_id)
+        .one_or_none()
+    )
+
+
+def delete_alert(db: Session, alert: UserAlert) -> None:
+    db.delete(alert)
+    db.commit()

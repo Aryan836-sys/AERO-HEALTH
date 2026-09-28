@@ -34,12 +34,12 @@ export default function AdvisoryPanel({ areaId, profile: profileOverride, expand
         <Icon name={result.data.level === 'low' ? 'check-circle' : 'alert'} size={15} />
         {t(`risk.${result.data.level}`)}
       </span>
-      <p className="advisory-recommendation">{t(result.data.recommendationKey)}</p>
+      <p className="advisory-recommendation">{result.data.recommendation ?? t(result.data.recommendationKey)}</p>
       {expanded && <div className="advisory-reasons">
         <h3>{t('whyThisAdvice')}</h3>
         {result.data.reasons.map((reason, index) => <p key={`${reason.key}-${index}`}>
           <Icon name="check" size={15} />
-          <span>{t(reason.key, reason.values)}</span>
+          <span>{reason.message ?? t(reason.key, reason.values)}</span>
         </p>)}
       </div>}
       <div className="advisory-aqi">
@@ -54,7 +54,7 @@ export default function AdvisoryPanel({ areaId, profile: profileOverride, expand
     </>}
     <p className="disclaimer">
       <Icon name="info" size={15} />
-      <span>{t('medicalDisclaimer')}</span>
+      <span>{result.data?.disclaimer ?? t('medicalDisclaimer')}</span>
     </p>
   </section>;
 }

@@ -450,5 +450,8 @@
   "viewTrend": "Show in chart",
   "submitRealReport": "Submit report",
   "reportReceived": "Your report has been received and is awaiting review.",
-  "reportsByCategory": "Reports by category"
+  "reportsByCategory": "Reports by category",
+  "district.Other": "Nearby areas",
+  "source.sensor": "Sensor",
+  "sourceHelp.sensor": "A reading from a low-cost or non-reference sensor. Useful for trends, but less precise than an official monitor."
 }

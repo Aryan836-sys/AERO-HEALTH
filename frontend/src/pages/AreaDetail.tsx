@@ -123,21 +123,21 @@ export default function AreaDetail() {
         <Icon name="sun" size={23} />
         <span>
           {t('temperature')}
-          <strong>{reading.weather.temperature}&deg;C</strong>
+          <strong>{reading.weather.temperature ?? '--'}&deg;C</strong>
         </span>
       </div>
       <div>
         <Icon name="drop" size={23} />
         <span>
           {t('humidity')}
-          <strong>{reading.weather.humidity}%</strong>
+          <strong>{reading.weather.humidity ?? '--'}%</strong>
         </span>
       </div>
       <div>
         <Icon name="wind" size={23} />
         <span>
           {t('wind')}
-          <strong>{reading.weather.windSpeed} km/h <small>{reading.weather.windDirection}</small></strong>
+          <strong>{reading.weather.windSpeed ?? '--'} km/h <small>{reading.weather.windDirection}</small></strong>
         </span>
       </div>
       <div>

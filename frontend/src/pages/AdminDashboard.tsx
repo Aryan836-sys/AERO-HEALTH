@@ -19,7 +19,7 @@ export default function AdminDashboard() {
   const [busy, setBusy] = useState('');
   const [detail, setDetail] = useState<PollutionReport | null>(null);
   const data = useAsync('admin', async () => {
-    const [reports, stats] = await Promise.all([api.getReports(), api.getAdminStats()]);
+    const [reports, stats] = await Promise.all([api.getModerationReports(), api.getAdminStats()]);
     return { reports, stats };
   });
   async function moderate(id: string, status: ReportStatus) {

@@ -147,7 +147,7 @@ export default function Home() {
             <small>US AQI</small>
           </div>
           <AqiIndicator value={area.reading?.aqi} compact />
-          <div className="mini-weather"><Icon name="sun" size={17} />{area.reading?.weather.temperature}&deg;</div>
+          <div className="mini-weather"><Icon name="sun" size={17} />{area.reading?.weather.temperature ?? '--'}&deg;</div>
         </div>
       </section>)}</div>
       <div className="home-bottom">

@@ -33,7 +33,8 @@ export default function ReportPage() {
   const [detail, setDetail] = useState<PollutionReport | null>(null);
   const [category, setCategory] = useState<ReportCategory | ''>('');
   const [description, setDescription] = useState('');
-  const [areaId, setAreaId] = useState('ratnapark');
+  const [chosenAreaId, setAreaId] = useState('');
+  const areaId = areas.some((item) => item.id === chosenAreaId) ? chosenAreaId : (areas.find((item) => item.reading) ?? areas[0])?.id ?? '';
   const [point, setPoint] = useState<[
     number,
     number
@@ -170,7 +171,7 @@ export default function ReportPage() {
               <AreaSelect value={areaId} onChange={changeArea} label={t('nearestArea')} />
               <p className="field-help">{t('pickLocationHint')}</p>
               <div className="report-map">
-                <AirMap areas={areas.filter((area) => area.featured)} selectedId={areaId} onSelect={changeArea} onPick={(lat, lng) => setPoint([lat, lng])} picked={point} largeBubbles={false} />
+                <AirMap areas={IS_DEMO ? areas.filter((area) => area.featured) : areas} selectedId={areaId} onSelect={changeArea} onPick={(lat, lng) => setPoint([lat, lng])} picked={point} largeBubbles={false} />
               </div>
               <div className="two-column-fields">
                 <label className="field">

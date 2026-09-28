@@ -3,6 +3,7 @@
 Password hashing is M1's concern (auth/JWT), not the DB layer's -- these
 functions take an already-hashed `password_hash`, never a raw password.
 """
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models import User
@@ -44,3 +45,7 @@ def delete_user(db: Session, user_id: int) -> None:
     if user is not None:
         db.delete(user)
         db.commit()
+
+
+def count_users(db: Session) -> int:
+    return db.query(func.count(User.id)).scalar()

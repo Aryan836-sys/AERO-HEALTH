@@ -26,6 +26,9 @@ class User(Base):
     preferred_language: Mapped[str] = mapped_column(
         String, nullable=False, server_default="en"
     )
+    # 'user' or 'admin'. Only an admin created via app.scripts.create_admin
+    # (or a direct DB update) can moderate -- registration always gives 'user'.
+    role: Mapped[str] = mapped_column(String, nullable=False, server_default="user")
     home_location_id: Mapped[int | None] = mapped_column(
         ForeignKey("locations.id"), nullable=True
     )

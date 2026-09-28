@@ -68,7 +68,7 @@ function StationMarker({ area, selected, metric, large, onSelect }: {
   const { areas } = useApp();
   const name = i18n.language === 'ne' ? area.nameNe : area.name;
   const category = getAqiCategory(area.reading?.aqi);
-  const value = area.reading ? metric === 'AQI' ? area.reading.aqi : area.reading.pollutants[metric] : null;
+  const value = area.reading ? metric === 'AQI' ? area.reading.aqi : area.reading.pollutants[metric] ?? null : null;
   const nearest = !area.reading ? nearestStation(area, areas) : null;
   const icon = useMemo(() => {
     const label = category ? t(`aqi.${category.key}.short`) : t('noData');
@@ -87,9 +87,9 @@ function StationMarker({ area, selected, metric, large, onSelect }: {
           <p className="popup-metric">
             {t('mainPollutant')}
             {" "}
-            <strong>{area.reading.mainPollutant}</strong>
+            <strong>{area.reading.mainPollutant ?? '--'}</strong>
           </p>
-          <div className="popup-weather"><Icon name="sun" size={15} />{area.reading.weather.temperature}&deg;C <Icon name="wind" size={15} />{area.reading.weather.windSpeed} km/h</div>
+          <div className="popup-weather"><Icon name="sun" size={15} />{area.reading.weather.temperature ?? '--'}&deg;C <Icon name="wind" size={15} />{area.reading.weather.windSpeed ?? '--'} km/h</div>
           <ReliabilityBadge reliability={area.reading.reliability} isDemo={area.reading.isDemo} />
           <Freshness date={area.reading.observedAt} isDemo={area.reading.isDemo} />
         </> : <>
@@ -153,7 +153,7 @@ export default function AirMap({ areas, selectedId, onSelect, metric = 'AQI', la
       <span>27.70 N / 85.35 E</span>
     </div>
     <MapContainer center={areas.length === 1 ? [areas[0].latitude, areas[0].longitude] : VALLEY_CENTER} zoom={window.innerWidth < 700 ? 10.8 : 12.2} minZoom={10} maxZoom={17} maxBounds={VALLEY_BOUNDS} maxBoundsViscosity={0.7} zoomSnap={0.2} zoomDelta={0.6} zoomControl={false} scrollWheelZoom={false} className="leaflet-map">
-      <TileLayer key={tileKey} url={import.meta.env.VITE_MAP_TILE_URL || 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'} attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>' eventHandlers={{
+      <TileLayer key={tileKey} url={import.meta.env.VITE_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'} maxZoom={19} attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors' eventHandlers={{
         tileload: () => { setTilesReady(true); setTilesFailed(false); }, tileerror: () => {
           failures.current += 1;
           if (failures.current > 8 && !tilesReady)

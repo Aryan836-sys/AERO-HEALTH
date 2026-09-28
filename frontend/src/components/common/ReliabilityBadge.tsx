@@ -7,7 +7,7 @@ export default function ReliabilityBadge({ reliability, isDemo = false }: {
 }) {
   const { t } = useTranslation();
   return <span className="reliability-badge" title={t(`sourceHelp.${reliability}`)}>
-    <Icon name={reliability === 'official' ? 'shield' : reliability === 'community' ? 'users' : 'sparkles'} size={13} />
+    <Icon name={reliability === 'official' ? 'shield' : reliability === 'community' ? 'users' : reliability === 'sensor' ? 'activity' : 'sparkles'} size={13} />
     {isDemo && `${t('demo')} \u00b7 `}
     {t(`source.${reliability}`)}
   </span>;

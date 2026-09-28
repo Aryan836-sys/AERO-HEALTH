@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "name": "openaq-api",
+    "website": "/",
+    "page": 1,
+    "limit": 100,
+    "found": 1
+  },
+  "results": [
+    {
+      "id": 3459,
+      "name": "Embassy Kathmandu",
+      "locality": "N/A",
+      "timezone": "Asia/Kathmandu",
+      "country": {
+        "id": 145,
+        "code": "NP",
+        "name": "Nepal"
+      },
+      "owner": {
+        "id": 4,
+        "name": "Unknown Governmental Organization"
+      },
+      "provider": {
+        "id": 119,
+        "name": "AirNow"
+      },
+      "isMobile": false,
+      "isMonitor": true,
+      "instruments": [
+        {
+          "id": 2,
+          "name": "Government Monitor"
+        }
+      ],
+      "sensors": [
+        {
+          "id": 7713,
+          "name": "o3 ppm",
+          "parameter": {
+            "id": 10,
+            "name": "o3",
+            "units": "ppm",
+            "displayName": "O₃"
+          }
+        },
+        {
+          "id": 7710,
+          "name": "pm25 µg/m³",
+          "parameter": {
+            "id": 2,
+            "name": "pm25",
+            "units": "µg/m³",
+            "displayName": "PM2.5"
+          }
+        }
+      ],
+      "coordinates": {
+        "latitude": 27.738703,
+        "longitude": 85.336206
+      },
+      "licenses": [
+        {
+          "id": 33,
+          "name": "US Public Domain",
+          "attribution": {
+            "name": "Unknown Governmental Organization",
+            "url": null
+          },
+          "dateFrom": "2016-01-30",
+          "dateTo": null
+        }
+      ],
+      "bounds": [
+        85.336206,
+        27.738703,
+        85.336206,
+        27.738703
+      ],
+      "distance": null,
+      "datetimeFirst": {
+        "utc": "2017-03-03T00:00:00Z",
+        "local": "2017-03-03T05:45:00+05:45"
+      },
+      "datetimeLast": {
+        "utc": "2026-06-17T23:15:00Z",
+        "local": "2026-06-18T05:00:00+05:45"
+      }
+    }
+  ]
+}

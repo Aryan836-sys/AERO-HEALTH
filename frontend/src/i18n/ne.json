@@ -81,5 +81,8 @@
   "aqi.sensitive.short": "संवेदनशील समूहका लागि अस्वास्थ्यकर",
   "aqi.unhealthy.short": "अस्वास्थ्यकर",
   "aqi.veryUnhealthy.short": "धेरै अस्वास्थ्यकर",
-  "aqi.hazardous.short": "खतरनाक"
+  "aqi.hazardous.short": "खतरनाक",
+  "district.Other": "वरपरका क्षेत्र",
+  "source.sensor": "सेन्सर",
+  "sourceHelp.sensor": "कम लागतको वा गैर-सन्दर्भ सेन्सरबाट आएको मापन। प्रवृत्ति हेर्न उपयोगी, तर आधिकारिक मापनभन्दा कम सटीक।"
 }

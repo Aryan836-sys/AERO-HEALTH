@@ -151,6 +151,7 @@ export const mockApi: ApiService = {
     return next;
   },
   async getReports() { await wait(); return clone(readReports()); },
+  async getModerationReports() { requireAdmin(); await wait(); return clone(readReports()); },
   async submitReport(form, progress) {
     progress(5);
     await wait(150);

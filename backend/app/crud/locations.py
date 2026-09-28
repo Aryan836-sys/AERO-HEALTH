@@ -24,6 +24,31 @@ def list_locations(db: Session) -> list[Location]:
     return db.query(Location).order_by(Location.id).all()
 
 
+def get_location_by_station_id(db: Session, source_station_id: str) -> Location | None:
+    """Resolve a source's station id (e.g. WAQI's `uid`) to its seeded
+    Location row -- the caching job needs this before it can insert a
+    reading (data-adapter-build-guide.md Phase 4/5).
+    """
+    return (
+        db.query(Location)
+        .filter(Location.source_station_id == source_station_id)
+        .one_or_none()
+    )
+
+
+# The two US Embassy monitors were created by import_opendata_nepal with their
+# bare OpenAQ ids, before OpenAQ ids were namespaced.
+_LEGACY_UNPREFIXED_OPENAQ_IDS = {3459, 3460}
+
+
+def get_location_by_openaq_id(db: Session, openaq_id: int) -> Location | None:
+    """Resolve an OpenAQ location id to its seeded Location row."""
+    location = get_location_by_station_id(db, f"openaq:{openaq_id}")
+    if location is None and openaq_id in _LEGACY_UNPREFIXED_OPENAQ_IDS:
+        location = get_location_by_station_id(db, str(openaq_id))
+    return location
+
+
 def get_nearest_location(
     db: Session, lat: float, lng: float
 ) -> tuple[Location, float] | None:

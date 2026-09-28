@@ -4,3 +4,15 @@ alembic
 geoalchemy2
 python-dotenv
 shapely
+httpx
+pydantic
+apscheduler
+tenacity
+fastapi
+uvicorn[standard]
+pydantic-settings
+python-jose[cryptography]
+bcrypt
+python-multipart
+email-validator
+slowapi

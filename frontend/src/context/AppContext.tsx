@@ -22,14 +22,18 @@ export function AppProvider({ children }: {
   children: ReactNode;
 }) {
   const { user } = useAuth();
-  const [selectedId, selectArea] = useState('ratnapark');
+  const [chosenId, selectArea] = useState('');
   const locations = useAsync('locations', api.getLocations);
   const userData = useAsync(`user:${user?.id ?? 'guest'}`, async () => {
     const [favorites, alerts, profile] = await Promise.all([api.getFavorites(), api.getAlerts(), api.getProfile()]);
     return { favorites, alerts, profile };
   }, !!user);
+  // Until the user picks one (or if their pick no longer exists), fall back to
+  // the first station that has a reading -- ids come from whichever backend is in use.
+  const areas = locations.data ?? [];
+  const selectedId = areas.some((area) => area.id === chosenId) ? chosenId : (areas.find((area) => area.reading) ?? areas[0])?.id ?? '';
   useEffect(() => { const reload = () => userData.reload(); window.addEventListener('aero:data-changed', reload); return () => window.removeEventListener('aero:data-changed', reload); }, [userData.reload]);
-  return <AppContext.Provider value={{ areas: locations.data ?? [], loading: locations.loading, error: locations.error, refresh: locations.reload, selectedId, selectArea, favorites: userData.data?.favorites ?? [], alerts: userData.data?.alerts ?? [], profile: userData.data?.profile ?? null, userDataLoading: userData.loading, userDataError: userData.error, refreshUser: userData.reload }}>{children}</AppContext.Provider>;
+  return <AppContext.Provider value={{ areas, loading: locations.loading, error: locations.error, refresh: locations.reload, selectedId, selectArea, favorites: userData.data?.favorites ?? [], alerts: userData.data?.alerts ?? [], profile: userData.data?.profile ?? null, userDataLoading: userData.loading, userDataError: userData.error, refreshUser: userData.reload }}>{children}</AppContext.Provider>;
 }
 export function useApp(): AppState {
   const context = useContext(AppContext);

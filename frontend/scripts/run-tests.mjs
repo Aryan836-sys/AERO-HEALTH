@@ -10,7 +10,7 @@ mkdirSync(output, { recursive: true });
 const sources = [
   'src/utils/aqi.ts', 'src/utils/geo.ts', 'src/utils/format.ts',
   'src/utils/validation.ts', 'src/utils/advisory.ts',
-  'src/services/fixtures.ts', 'src/services/storage.ts', 'src/services/mockApi.ts',
+  'src/services/fixtures.ts', 'src/services/storage.ts', 'src/services/mockApi.ts', 'src/services/mappers.ts',
 ];
 // npm puts the project's pinned compiler on PATH. A global tsc also works offline.
 const compiler = spawnSync(process.platform === 'win32' ? 'tsc.cmd' : 'tsc', [

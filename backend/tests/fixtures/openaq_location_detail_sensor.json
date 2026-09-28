@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "name": "openaq-api",
+    "website": "/",
+    "page": 1,
+    "limit": 100,
+    "found": 1
+  },
+  "results": [
+    {
+      "id": 5509787,
+      "name": "Baluwatar (SC-02) - GD Labs",
+      "locality": null,
+      "timezone": "Asia/Kathmandu",
+      "country": {
+        "id": 145,
+        "code": "NP",
+        "name": "Nepal"
+      },
+      "owner": {
+        "id": 22716,
+        "name": "Green Decision Labs and Research"
+      },
+      "provider": {
+        "id": 66,
+        "name": "AirGradient"
+      },
+      "isMobile": false,
+      "isMonitor": false,
+      "instruments": [
+        {
+          "id": 7,
+          "name": "Unknown AirGradient Sensor"
+        }
+      ],
+      "sensors": [
+        {
+          "id": 14207424,
+          "name": "pm1 µg/m³",
+          "parameter": {
+            "id": 19,
+            "name": "pm1",
+            "units": "µg/m³",
+            "displayName": "PM1"
+          }
+        },
+        {
+          "id": 14207425,
+          "name": "pm25 µg/m³",
+          "parameter": {
+            "id": 2,
+            "name": "pm25",
+            "units": "µg/m³",
+            "displayName": "PM2.5"
+          }
+        },
+        {
+          "id": 14207426,
+          "name": "relativehumidity %",
+          "parameter": {
+            "id": 98,
+            "name": "relativehumidity",
+            "units": "%",
+            "displayName": "RH"
+          }
+        },
+        {
+          "id": 14207427,
+          "name": "temperature c",
+          "parameter": {
+            "id": 100,
+            "name": "temperature",
+            "units": "c",
+            "displayName": "Temperature (C)"
+          }
+        },
+        {
+          "id": 14207428,
+          "name": "um003 particles/cm³",
+          "parameter": {
+            "id": 125,
+            "name": "um003",
+            "units": "particles/cm³",
+            "displayName": "PM0.3 count"
+          }
+        }
+      ],
+      "coordinates": {
+        "latitude": 27.7249438,
+        "longitude": 85.331062
+      },
+      "licenses": [
+        {
+          "id": 41,
+          "name": "CC BY 4.0",
+          "attribution": {
+            "name": "Green Decision Labs and Research",
+            "url": null
+          },
+          "dateFrom": "2023-07-15",
+          "dateTo": null
+        }
+      ],
+      "bounds": [
+        85.331062,
+        27.7249438,
+        85.331062,
+        27.7249438
+      ],
+      "distance": null,
+      "datetimeFirst": {
+        "utc": "2025-09-25T07:00:00Z",
+        "local": "2025-09-25T12:45:00+05:45"
+      },
+      "datetimeLast": {
+        "utc": "2026-09-10T06:00:00Z",
+        "local": "2026-09-10T11:45:00+05:45"
+      }
+    }
+  ]
+}

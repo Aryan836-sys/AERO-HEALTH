@@ -1,27 +1,28 @@
 /**
- * Provisional frontend DTOs, NOT generated from a real backend.
- * The supplied project guide contains endpoint names but no OpenAPI schema.
- * Keep these in sync with contracts/openapi.demo.json until the team supplies one.
- * `npm run types:generate` writes the real generated schema to api.generated.ts;
- * reconcile the service adapter before replacing this provisional contract.
+ * The frontend's own domain types -- what components consume.
+ * The backend's wire format lives in api.generated.ts (from `npm run
+ * types:generate`); services/mappers.ts translates between the two, so a
+ * backend change surfaces as a type error there, not in the UI.
  */
-export type District = 'Kathmandu' | 'Lalitpur' | 'Bhaktapur';
-export type Reliability = 'official' | 'community' | 'modelled';
+export type District = 'Kathmandu' | 'Lalitpur' | 'Bhaktapur' | 'Other';
+export type Reliability = 'official' | 'sensor' | 'community' | 'modelled';
 export type Pollutant = 'PM2.5' | 'PM10' | 'O3' | 'NO2' | 'SO2' | 'CO';
 export type CategoryKey = 'good' | 'moderate' | 'sensitive' | 'unhealthy' | 'veryUnhealthy' | 'hazardous';
 export type Range = '24h' | '7d' | '30d';
 export interface Reading {
   aqi: number;
-  mainPollutant: Pollutant;
-  pollutants: Record<Pollutant, number>;
+  /** null when the source did not say which pollutant dominates. */
+  mainPollutant: Pollutant | null;
+  /** Real stations skip sensors, so any pollutant may be absent. */
+  pollutants: Partial<Record<Pollutant, number>>;
   source: string;
   reliability: Reliability;
   observedAt: string;
   weather: {
-    temperature: number;
-    humidity: number;
-    windSpeed: number;
-    windDirection: string;
+    temperature: number | null;
+    humidity: number | null;
+    windSpeed: number | null;
+    windDirection: string | null;
   };
   isDemo: boolean;
 }
@@ -61,8 +62,13 @@ export interface HealthProfile {
 export interface Advisory {
   level: 'low' | 'elevated' | 'high';
   recommendationKey: string;
+  /** Backend-written text (English). When present it is shown instead of translating recommendationKey. */
+  recommendation?: string;
+  disclaimer?: string;
   reasons: {
     key: string;
+    /** Backend-written explanation (English). When present it is shown instead of translating key. */
+    message?: string;
     values?: Record<string, string | number>;
   }[];
   aqi: number;
@@ -117,6 +123,8 @@ export interface ApiService {
   toggleAlert(id: string): Promise<AlertRule[]>;
   deleteAlert(id: string): Promise<AlertRule[]>;
   getReports(): Promise<PollutionReport[]>;
+  /** Every report in every state, for moderators. */
+  getModerationReports(): Promise<PollutionReport[]>;
   submitReport(data: FormData, onProgress: (percent: number) => void): Promise<PollutionReport>;
   moderateReport(id: string, status: ReportStatus): Promise<PollutionReport>;
   getAdminStats(): Promise<AdminStats>;
