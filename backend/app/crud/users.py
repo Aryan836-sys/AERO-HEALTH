@@ -15,6 +15,7 @@ def create_user(
     password_hash: str,
     preferred_language: str = "en",
     home_location_id: int | None = None,
+    role: str = "registered",
 ) -> User:
     user = User(
         full_name=full_name,
@@ -22,6 +23,7 @@ def create_user(
         password_hash=password_hash,
         preferred_language=preferred_language,
         home_location_id=home_location_id,
+        role=role,
     )
     db.add(user)
     db.commit()

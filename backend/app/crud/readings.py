@@ -24,9 +24,20 @@ def insert_reading(db: Session, **fields) -> AqiReading:
 
 
 def get_latest_reading(db: Session, location_id: int) -> AqiReading | None:
+    """The most recent reading that actually has a usable `aqi` value.
+
+    Filters out aqi IS NULL rows (OpenWeatherMap-only rows -- see
+    aqi_reading.py's scale-safety rule) rather than ordering by
+    recorded_at alone. Without this filter, since cache_readings.py
+    always fetches OWM *after* the AQI source for each location, OWM's
+    row is almost always the most recent one -- meaning every caller
+    (the /locations display, reliability.py's stale-cache fallback
+    tier, and the advisory endpoint) would silently get a null aqi back
+    even when a perfectly good real reading exists one row earlier.
+    """
     return (
         db.query(AqiReading)
-        .filter(AqiReading.location_id == location_id)
+        .filter(AqiReading.location_id == location_id, AqiReading.aqi.isnot(None))
         .order_by(AqiReading.recorded_at.desc())
         .first()
     )

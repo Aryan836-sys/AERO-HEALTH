@@ -59,12 +59,19 @@ class AdvisoryError(Exception):
     """Raised when an advisory can't be generated from the given input."""
 
 
+_MEDICAL_DISCLAIMER = (
+    "This is general guidance based on current air quality data, not "
+    "medical advice. Consult a doctor for concerns specific to your health."
+)
+
+
 @dataclass
 class Advisory:
     aqi: int
     aqi_category: str
     severity: int
     recommendations: list[str] = field(default_factory=list)
+    disclaimer: str = _MEDICAL_DISCLAIMER
 
 
 def get_aqi_category(aqi: int) -> tuple[str, int]:

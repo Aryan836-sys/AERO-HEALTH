@@ -66,3 +66,26 @@ def test_invalid_owm_index_range_raises():
 def test_naive_datetime_raises():
     with pytest.raises(NormalizationError):
         normalize_reading(_base(recorded_at=datetime(2026, 9, 19, 12, 0)))  # no tzinfo
+
+
+def test_openaq_reading_gets_a_computed_aqi_from_pm25():
+    """The real bug this closes: an OpenAQ reading with elevated PM2.5 but
+    no `aqi` must not pass through as `aqi: None` (which the frontend
+    then displays as 0 / "Good") -- normalize_reading() computes a real
+    one from the concentration OpenAQ actually gave us."""
+    reading = normalize_reading(
+        _base(aqi=None, source="openaq", reliability_status="sensor", pm25=40.0, pm10=None)
+    )
+    assert reading["aqi"] is not None
+    assert reading["aqi"] > 100  # 40 ug/m3 PM2.5 is Unhealthy for Sensitive Groups
+    assert reading["main_pollutant"] == "pm25"
+
+
+def test_openaq_reading_with_no_pollutants_stays_null_not_zero():
+    """No pm25/pm10 at all -- nothing to compute from, so `aqi` must stay
+    None rather than becoming a fabricated 0."""
+    reading = normalize_reading(
+        _base(aqi=None, source="openaq", reliability_status="sensor", pm25=None, pm10=None)
+    )
+    assert reading["aqi"] is None
+    assert reading.get("main_pollutant") is None

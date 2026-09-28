@@ -8,6 +8,7 @@ from app.models.pollution_report import PollutionReport
 from app.models.user_alert import UserAlert
 from app.models.favorite_location import FavoriteLocation
 from app.models.health_advisory import HealthAdvisory
+from app.models.audit_log import AuditLog
 
 __all__ = [
     "Location",
@@ -18,4 +19,5 @@ __all__ = [
     "UserAlert",
     "FavoriteLocation",
     "HealthAdvisory",
+    "AuditLog",
 ]

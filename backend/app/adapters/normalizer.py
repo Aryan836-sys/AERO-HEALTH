@@ -16,6 +16,8 @@ the scale-safety guarantee:
 from datetime import datetime
 from typing import Any
 
+from app.adapters.epa_aqi import compute_aqi_and_dominant
+
 _VALID_SOURCES = {"waqi", "openaq", "openweathermap", "community", "opendata_nepal_historical"}
 _VALID_RELIABILITY = {"official", "sensor", "community", "modelled"}
 
@@ -53,6 +55,23 @@ def normalize_reading(fields: dict[str, Any]) -> dict[str, Any]:
 
     if source in ("openaq",) and aqi is not None:
         raise NormalizationError("openaq readings must never set `aqi` -- source gives concentrations only.")
+
+    # The adapter itself never sets `aqi` for OpenAQ (enforced above) --
+    # but a reading with real pollutant concentrations and no AQI number
+    # would otherwise display on the frontend as `aqi: 0` ("Good"),
+    # misrepresenting genuinely unhealthy air. Compute a real one here,
+    # from the concentrations OpenAQ actually gave us, using the EPA
+    # breakpoint method (see epa_aqi.py). This is normalize_reading()'s
+    # own computation, not the adapter's -- it still never fabricates a
+    # number when there's nothing to compute it from (both pm25 and pm10
+    # absent leaves `aqi` None, same as before).
+    if source == "openaq" and aqi is None:
+        computed_aqi, dominant = compute_aqi_and_dominant(
+            {"pm25": fields.get("pm25"), "pm10": fields.get("pm10")}
+        )
+        if computed_aqi is not None:
+            fields["aqi"] = computed_aqi
+            fields["main_pollutant"] = dominant
 
     if owm_index is not None and owm_index not in (1, 2, 3, 4, 5):
         raise NormalizationError(f"owm_aqi_index out of range: {owm_index!r}")

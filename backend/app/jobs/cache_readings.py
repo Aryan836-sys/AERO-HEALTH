@@ -1,24 +1,19 @@
 """Day 6: the scheduled caching job.
 
-Fetches a fresh reading for every WAQI-backed location and inserts it into
-aqi_readings. Two sources per location:
-- WAQI, via the location's own source_station_id (the same station the
-  location was seeded from -- Day 4's pattern, moved here as the
-  production job)
-- OpenWeatherMap, via the location's lat/lng (Day 5's pattern) -- gives
-  weather + a second, independent pollution reading
+Fetches a reading for every WAQI-backed location using the fallback chain
+in adapters/reliability.py (WAQI -> OpenAQ -> reuse the last cached
+reading), plus an independent OpenWeatherMap call for weather + OWM's own
+pollution index.
 
-OpenAQ is intentionally NOT called here: OpenAQ uses its own location IDs,
-which aren't stored anywhere on our Location model (WAQI's uid and OpenAQ's
-location id are different ID systems for the same physical place). Wiring
-that up needs a real id-mapping step (e.g. a `openaq_location_id` column,
-or a nearest-match against OpenAQ's /locations by coordinates) -- not
-guessed here, left as a follow-up rather than silently skipped without
-explanation.
+Why OWM is separate from the fallback chain: it's not a substitute for a
+missing AQI reading (it never provides `aqi`, only `owm_aqi_index`, a
+different scale -- see aqi_reading.py's "Scale-safety rule"), so it's
+inserted as its own row alongside whatever the fallback chain produced,
+not used *instead of* it.
 
 One location's failure never stops the rest -- each source, per location,
-is wrapped so a single bad WAQI response or a down OpenWeatherMap call
-doesn't lose every other reading in the run.
+is wrapped so a single bad response or a down API doesn't lose every other
+reading in the run.
 
 Run once:
     python -m app.jobs.cache_readings
@@ -31,18 +26,26 @@ import os
 import sys
 import time
 
+from geoalchemy2.shape import to_shape
+
 from app.adapters.openweather import OpenWeatherError, get_location_reading as get_owm_reading
-from app.adapters.waqi import WaqiFeedError, get_station_reading
+from app.adapters.reliability import ReliabilityError, get_reading_with_fallback
 from app.crud.readings import insert_reading
 from app.database import SessionLocal
 from app.models import Location
-from geoalchemy2.shape import to_shape
 
 
 def run_once() -> dict[str, int]:
     """One full pass over every WAQI-backed location. Returns counts."""
     db = SessionLocal()
-    stats = {"waqi_inserted": 0, "waqi_skipped": 0, "owm_inserted": 0, "owm_skipped": 0}
+    stats = {
+        "waqi_inserted": 0,
+        "openaq_inserted": 0,
+        "stale_cache_reused": 0,
+        "unavailable": 0,
+        "owm_inserted": 0,
+        "owm_skipped": 0,
+    }
     try:
         locations = (
             db.query(Location).filter(Location.source_station_id.isnot(None)).all()
@@ -51,13 +54,27 @@ def run_once() -> dict[str, int]:
 
         for loc in locations:
             try:
-                fields = get_station_reading(loc.source_station_id)
-                insert_reading(db, location_id=loc.id, **fields)
-                stats["waqi_inserted"] += 1
-                print(f"  waqi ok: {loc.area_name} -> aqi={fields['aqi']}")
-            except WaqiFeedError as exc:
-                stats["waqi_skipped"] += 1
-                print(f"  waqi skipped: {loc.area_name} -> {exc}")
+                result = get_reading_with_fallback(db, loc)
+            except ReliabilityError as exc:
+                stats["unavailable"] += 1
+                print(f"  reliability error: {loc.area_name} -> {exc}")
+            else:
+                tier = result["tier"]
+                if tier in ("waqi", "openaq"):
+                    fields = result["fields"]
+                    insert_reading(db, location_id=loc.id, **fields)
+                    stats[f"{tier}_inserted"] += 1
+                    print(f"  {tier} ok: {loc.area_name} -> aqi={fields.get('aqi')}")
+                elif tier == "stale_cache":
+                    stale = result["stale_reading"]
+                    stats["stale_cache_reused"] += 1
+                    print(
+                        f"  stale cache: {loc.area_name} -> reusing reading from "
+                        f"{stale.recorded_at} ({result['error']})"
+                    )
+                else:  # "unavailable"
+                    stats["unavailable"] += 1
+                    print(f"  unavailable: {loc.area_name} -> {result['error']}")
 
             try:
                 point = to_shape(loc.geometry)

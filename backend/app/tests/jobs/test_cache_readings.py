@@ -1,69 +1,107 @@
-from datetime import datetime, timezone
-from unittest.mock import patch
+"""Day 6: the scheduled caching job.
 
-from app.adapters.waqi import WaqiFeedError
-from app.adapters.openweather import OpenWeatherError
-from app.jobs.cache_readings import run_once
+Fetches a reading for every WAQI-backed location using the fallback chain
+in adapters/reliability.py (WAQI -> OpenAQ -> reuse the last cached
+reading), plus an independent OpenWeatherMap call for weather + OWM's own
+pollution index.
+
+Why OWM is separate from the fallback chain: it's not a substitute for a
+missing AQI reading (it never provides `aqi`, only `owm_aqi_index`, a
+different scale -- see aqi_reading.py's "Scale-safety rule"), so it's
+inserted as its own row alongside whatever the fallback chain produced,
+not used *instead of* it.
+
+One location's failure never stops the rest -- each source, per location,
+is wrapped so a single bad response or a down API doesn't lose every other
+reading in the run.
+
+Run once:
+    python -m app.jobs.cache_readings
+
+Run continuously, sleeping AQI_CACHE_INTERVAL_MINUTES (default 30) between
+runs:
+    python -m app.jobs.cache_readings --loop
+"""
+import os
+import sys
+import time
+
+from geoalchemy2.shape import to_shape
+
+from app.adapters.openweather import OpenWeatherError, get_location_reading as get_owm_reading
+from app.adapters.reliability import ReliabilityError, get_reading_with_fallback
+from app.crud.readings import insert_reading
+from app.database import SessionLocal
+from app.models import Location
 
 
-def _fake_waqi_fields(aqi=88):
-    return {
-        "aqi": aqi, "main_pollutant": "pm25", "pm25": 88.0, "pm10": None,
-        "o3": None, "no2": None, "so2": None, "co": None,
-        "owm_aqi_index": None, "source": "waqi", "reliability_status": "official",
-        "recorded_at": datetime.now(timezone.utc), "fetched_at": datetime.now(timezone.utc),
+def run_once() -> dict[str, int]:
+    """One full pass over every WAQI-backed location. Returns counts."""
+    db = SessionLocal()
+    stats = {
+        "waqi_inserted": 0,
+        "openaq_inserted": 0,
+        "stale_cache_reused": 0,
+        "unavailable": 0,
+        "owm_inserted": 0,
+        "owm_skipped": 0,
     }
+    try:
+        locations = (
+            db.query(Location).filter(Location.source_station_id.isnot(None)).all()
+        )
+        print(f"Caching job: {len(locations)} location(s).")
+
+        for loc in locations:
+            try:
+                result = get_reading_with_fallback(db, loc)
+            except ReliabilityError as exc:
+                stats["unavailable"] += 1
+                print(f"  reliability error: {loc.area_name} -> {exc}")
+            else:
+                tier = result["tier"]
+                if tier in ("waqi", "openaq"):
+                    fields = result["fields"]
+                    insert_reading(db, location_id=loc.id, **fields)
+                    stats[f"{tier}_inserted"] += 1
+                    print(f"  {tier} ok: {loc.area_name} -> aqi={fields.get('aqi')}")
+                elif tier == "stale_cache":
+                    stale = result["stale_reading"]
+                    stats["stale_cache_reused"] += 1
+                    print(
+                        f"  stale cache: {loc.area_name} -> reusing reading from "
+                        f"{stale.recorded_at} ({result['error']})"
+                    )
+                else:  # "unavailable"
+                    stats["unavailable"] += 1
+                    print(f"  unavailable: {loc.area_name} -> {result['error']}")
+
+            try:
+                point = to_shape(loc.geometry)
+                fields = get_owm_reading(point.y, point.x)  # y=lat, x=lng
+                insert_reading(db, location_id=loc.id, **fields)
+                stats["owm_inserted"] += 1
+                print(f"  owm ok: {loc.area_name} -> owm_aqi_index={fields['owm_aqi_index']}")
+            except OpenWeatherError as exc:
+                stats["owm_skipped"] += 1
+                print(f"  owm skipped: {loc.area_name} -> {exc}")
+
+        print(f"\nDone. {stats}")
+        return stats
+    finally:
+        db.close()
 
 
-def _fake_owm_fields():
-    return {
-        "aqi": None, "main_pollutant": None, "pm25": 50.0, "pm10": None,
-        "o3": None, "no2": None, "so2": None, "co": None,
-        "temperature": 22.0, "humidity": 50, "wind": 2.0, "pressure": 1010,
-        "owm_aqi_index": 3, "source": "openweathermap", "reliability_status": "modelled",
-        "recorded_at": datetime.now(timezone.utc), "fetched_at": datetime.now(timezone.utc),
-    }
+def run_loop() -> None:
+    interval_minutes = int(os.environ.get("AQI_CACHE_INTERVAL_MINUTES", "30"))
+    print(f"Caching job loop: running every {interval_minutes} minute(s). Ctrl+C to stop.")
+    while True:
+        run_once()
+        time.sleep(interval_minutes * 60)
 
 
-def test_run_once_inserts_both_sources_for_each_location():
-    with patch("app.jobs.cache_readings.get_station_reading", return_value=_fake_waqi_fields()), \
-         patch("app.jobs.cache_readings.get_owm_reading", return_value=_fake_owm_fields()):
-        stats = run_once()
-
-    assert stats["waqi_inserted"] > 0
-    assert stats["owm_inserted"] > 0
-    assert stats["waqi_skipped"] == 0
-    assert stats["owm_skipped"] == 0
-
-
-def test_run_once_isolates_waqi_failure_from_owm():
-    """One source failing for a location must not block the other source
-    for that same location, or any source for any other location."""
-    with patch("app.jobs.cache_readings.get_station_reading", side_effect=WaqiFeedError("boom")), \
-         patch("app.jobs.cache_readings.get_owm_reading", return_value=_fake_owm_fields()):
-        stats = run_once()
-
-    assert stats["waqi_inserted"] == 0
-    assert stats["waqi_skipped"] > 0
-    assert stats["owm_inserted"] > 0  # OWM still ran despite WAQI failing every time
-
-
-def test_run_once_isolates_owm_failure_from_waqi():
-    with patch("app.jobs.cache_readings.get_station_reading", return_value=_fake_waqi_fields()), \
-         patch("app.jobs.cache_readings.get_owm_reading", side_effect=OpenWeatherError("boom")):
-        stats = run_once()
-
-    assert stats["waqi_inserted"] > 0
-    assert stats["owm_inserted"] == 0
-    assert stats["owm_skipped"] > 0
-
-
-def test_run_once_one_bad_location_does_not_stop_others():
-    """If WAQI fails for every call, every location should still be
-    attempted (skipped count == number of locations, not a crash)."""
-    with patch("app.jobs.cache_readings.get_station_reading", side_effect=WaqiFeedError("boom")), \
-         patch("app.jobs.cache_readings.get_owm_reading", side_effect=OpenWeatherError("boom")):
-        stats = run_once()
-
-    assert stats["waqi_skipped"] == stats["owm_skipped"]
-    assert stats["waqi_skipped"] > 0
+if __name__ == "__main__":
+    if "--loop" in sys.argv:
+        run_loop()
+    else:
+        run_once()

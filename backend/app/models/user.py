@@ -26,6 +26,10 @@ class User(Base):
     preferred_language: Mapped[str] = mapped_column(
         String, nullable=False, server_default="en"
     )
+    # 'guest' | 'registered' | 'admin' -- see core/security.py for how a
+    # guest is represented (no row at all -- an unauthenticated request)
+    # versus this column, which only ever applies to a real account.
+    role: Mapped[str] = mapped_column(String, nullable=False, server_default="registered")
     home_location_id: Mapped[int | None] = mapped_column(
         ForeignKey("locations.id"), nullable=True
     )
